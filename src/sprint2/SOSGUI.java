@@ -35,7 +35,7 @@ public class SOSGUI extends JFrame {
         setResizable(false);
         
         // Initialize game with default config
-        game = new SOSGame(5, SOSBoard.GameMode.SIMPLE);
+        game = new SOSGame(3, SOSBoard.GameMode.SIMPLE);
         board = game.getBoard();
         
         createComponents();
@@ -58,7 +58,7 @@ public class SOSGUI extends JFrame {
         gameModeGroup.add(generalGameRadioButton);
         
         boardSizeField = new JComboBox<>(new String[]{"3", "4", "5", "6", "7", "8", "9"});
-        boardSizeField.setSelectedItem("5");
+        boardSizeField.setSelectedItem("3");
         
         // Center panel components
         
@@ -194,9 +194,33 @@ public class SOSGUI extends JFrame {
         // Board size changing validation
         boardSizeField.addActionListener(e -> {
             int newSize = Integer.parseInt((String) boardSizeField.getSelectedItem());
-            game = new SOSGame(newSize, game.getBoard().getGameMode());
+            SOSBoard.GameMode currentMode = simpleGameRadioButton.isSelected() 
+                ? SOSBoard.GameMode.SIMPLE 
+                : SOSBoard.GameMode.GENERAL;
+            game = new SOSGame(newSize, currentMode);
+            board = game.getBoard();
             updateBoardDisplay(newSize);
             updateStatus();
+        });
+        
+        // Simple game mode
+        simpleGameRadioButton.addActionListener(e -> {
+            if (simpleGameRadioButton.isSelected()) {
+                int currentSize = game.getBoard().getSize();
+                game = new SOSGame(currentSize, SOSBoard.GameMode.SIMPLE);
+                board = game.getBoard();
+                updateStatus();
+            }
+        });
+        
+        // General game mode
+        generalGameRadioButton.addActionListener(e -> {
+            if (generalGameRadioButton.isSelected()) {
+                int currentSize = game.getBoard().getSize();
+                game = new SOSGame(currentSize, SOSBoard.GameMode.GENERAL);
+                board = game.getBoard();
+                updateStatus();
+            }
         });
         
         // Starts a new game
@@ -204,6 +228,7 @@ public class SOSGUI extends JFrame {
             updatePlayerSettings();
             game.startNewGame();
             clearBoardDisplay();
+            updateGameSettingsEnabled(false);
             updateStatus();
         });
         
@@ -282,8 +307,8 @@ public class SOSGUI extends JFrame {
             if (game.getBoard().isBoardFull()) {
                 game.endGame();
             }
-        updateStatus();
-    }
+            updateStatus();
+        }
         else {
             JOptionPane.showMessageDialog(this, 
                 "Invalid move. Spot is already taken!", 
@@ -342,13 +367,22 @@ public class SOSGUI extends JFrame {
     private void updateStatus() {
         if (!game.isGameStarted()) {
             statusLabel.setText("Click 'New Game' to start");
+            updateGameSettingsEnabled(true);
         } 
         else if (game.isGameEnded()) {
             statusLabel.setText("Game Over");
+            updateGameSettingsEnabled(true);
         } 
         else {
             statusLabel.setText(game.getCurrentPlayer() + "'s Turn");
         }
+    }
+    
+    // Enables/disables game settings
+    private void updateGameSettingsEnabled(boolean enabled) {
+        boardSizeField.setEnabled(enabled);
+        simpleGameRadioButton.setEnabled(enabled);
+        generalGameRadioButton.setEnabled(enabled);
     }
     
     public static void main(String[] args) {
