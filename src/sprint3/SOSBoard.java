@@ -103,4 +103,50 @@ public class SOSBoard {
         }
         return true;
     }
+    
+    public boolean checkSOS() {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (multipleSOS(row, col)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+	public boolean multipleSOS(int row, int column) {
+        if (!isValidPosition(row, column)) {
+            return false;
+        }
+        
+        // Directions of possible SOS sequence
+        int[][] directions = {
+            {0, 1},   // horizontal
+            {1, 0},   // vertical
+            {1, 1},   // diagonal down-right
+            {1, -1}   // diagonal down-left
+        };
+        
+        for (int[] dir : directions) {
+            int dr = dir[0];
+            int dc = dir[1];
+            int r1 = row - dr;
+            int c1 = column - dc;
+            int r2 = row;
+            int c2 = column;
+            int r3 = row + dr;
+            int c3 = column + dc;
+            
+            if (isValidPosition(r1, c1) && isValidPosition(r2, c2) && isValidPosition(r3, c3)) {
+                if (tiles[r1][c1] == TileState.S && 
+                    tiles[r2][c2] == TileState.O && 
+                    tiles[r3][c3] == TileState.S) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
 }

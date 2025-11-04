@@ -18,6 +18,7 @@ public class SOSGame {
 	private PlayerLetter redLetter;
 	private boolean gameStarted;
 	private boolean gameEnded;
+    private GameMode gameModeHandler;
 	
 	public SOSGame(int boardSize, SOSBoard.GameMode gameMode) {
 		this.board = new SOSBoard(boardSize, gameMode);
@@ -27,6 +28,14 @@ public class SOSGame {
 		this.redLetter = PlayerLetter.O;
 		this.gameStarted = false;
 		this.gameEnded = false;
+		
+		// Gamemode logic implementation
+		if (gameMode == SOSBoard.GameMode.SIMPLE) {
+			this.gameModeHandler = new SimpleGameMode(board, this);
+		} 
+		else {
+			this.gameModeHandler = new GeneralGameMode(board, this);
+		}
 	}
 
     public SOSBoard getBoard() {
@@ -77,6 +86,13 @@ public class SOSGame {
 		board.reset();
 		gameStarted = true;
 		gameEnded = false;
+		
+        if (board.getGameMode() == SOSBoard.GameMode.SIMPLE) {
+            gameModeHandler = new SimpleGameMode(board, this);
+        }
+		else {
+            gameModeHandler = new GeneralGameMode(board, this);
+        }
 	}
 	
     public boolean makeMove(int row, int column, SOSBoard.TileState tileState) {
@@ -84,7 +100,14 @@ public class SOSGame {
 			return false;
 		}
 		
-		return board.makeMove(row, column, tileState);
+		boolean moveSuccessful = board.makeMove(row, column, tileState);
+		
+		if (moveSuccessful) {
+			// Use the game mode handler to process the move
+			gameModeHandler.handleMove(row, column);
+		}
+		
+		return moveSuccessful;
 	}
 	
 	public String getCurrentPlayer() {
@@ -110,6 +133,10 @@ public class SOSGame {
 	
 	public boolean isBoardFull() {
 		return board.isBoardFull();
+	}
+	
+	public String getWinner() {
+		return gameModeHandler.getWinner();
 	}
 	
 }
