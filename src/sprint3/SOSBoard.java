@@ -83,6 +83,10 @@ public class SOSBoard {
     public String getCurrentPlayer() {
         return isBluePlayerTurn ? "Blue Player" : "Red Player";
     }
+
+    public void extraTurn() {
+        isBluePlayerTurn = !isBluePlayerTurn;
+    }
     
     public void reset() {
         for (int i = 0; i < size; i++) {
