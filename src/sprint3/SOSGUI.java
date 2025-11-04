@@ -370,7 +370,16 @@ public class SOSGUI extends JFrame {
             updateGameSettingsEnabled(true);
         } 
         else if (game.isGameEnded()) {
-            statusLabel.setText("Game Over");
+            String winner = game.getWinner();
+            if (winner == null) {
+                statusLabel.setText("Game Over");
+            } 
+            else if ("Draw".equals(winner)) {
+                statusLabel.setText("Game Over - Draw");
+            } 
+            else {
+                statusLabel.setText("Game Over - " + winner + " wins!");
+            }
             updateGameSettingsEnabled(true);
         } 
         else {

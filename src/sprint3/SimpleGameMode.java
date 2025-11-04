@@ -14,7 +14,16 @@ public class SimpleGameMode implements GameMode {
 
     @Override
     public void handleMove(int row, int column) {
-        // logic here
+        if (board.checkSOS()) {
+            winner = board.isBluePlayerTurn() ? "Red Player" : "Blue Player";
+            game.endGame();
+            return;
+        }
+
+        if (board.isBoardFull()) {
+            winner = "Draw";
+            game.endGame();
+        }
     }
 
     @Override
