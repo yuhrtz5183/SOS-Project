@@ -86,5 +86,13 @@ public class GeneralGameMode implements GameMode {
     public String getWinner() {
         return winner;
     }
+    
+    public int getBlueScore() {
+        return blueScore;
+    }
+    
+    public int getRedScore() {
+        return redScore;
+    }
 }
 

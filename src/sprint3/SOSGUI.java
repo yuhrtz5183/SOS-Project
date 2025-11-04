@@ -28,6 +28,9 @@ public class SOSGUI extends JFrame {
     private JRadioButton redSRadioButton;
     private JRadioButton redORadioButton;
     
+    private JLabel blueScoreLabel;
+    private JLabel redScoreLabel;
+    
     public SOSGUI() {
         setTitle("SOS Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,8 +149,15 @@ public class SOSGUI extends JFrame {
         blueLetterPanel.add(new JLabel("Letter:"));
         blueLetterPanel.add(blueSRadioButton);
         blueLetterPanel.add(blueORadioButton);
+        
+        blueScoreLabel = new JLabel("SOS: 0");
+        blueScoreLabel.setVisible(false);
+        JPanel blueScorePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        blueScorePanel.add(blueScoreLabel);
+        
         bluePlayerPanel.add(bluePlayerTypePanel);
         bluePlayerPanel.add(blueLetterPanel);
+        bluePlayerPanel.add(blueScorePanel);
         
         // Game board panel
         JPanel boardPanel = new JPanel(new BorderLayout());
@@ -176,8 +186,15 @@ public class SOSGUI extends JFrame {
         redLetterPanel.add(new JLabel("Letter:"));
         redLetterPanel.add(redSRadioButton);
         redLetterPanel.add(redORadioButton);
+        
+        redScoreLabel = new JLabel("SOS: 0");
+        redScoreLabel.setVisible(false);
+        JPanel redScorePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        redScorePanel.add(redScoreLabel);
+        
         redPlayerPanel.add(redPlayerTypePanel);
         redPlayerPanel.add(redLetterPanel);
+        redPlayerPanel.add(redScorePanel);
        
         centerPanel.add(bluePlayerPanel, BorderLayout.WEST);
         centerPanel.add(boardPanel, BorderLayout.CENTER);
@@ -229,6 +246,7 @@ public class SOSGUI extends JFrame {
             game.startNewGame();
             clearBoardDisplay();
             updateGameSettingsEnabled(false);
+            updateScoreLabels();
             updateStatus();
         });
         
@@ -352,6 +370,21 @@ public class SOSGUI extends JFrame {
                         break;
                 }
             }
+        }
+        
+        updateScoreLabels();
+    }
+    
+    private void updateScoreLabels() {
+        if (board.getGameMode() == SOSBoard.GameMode.GENERAL && game.isGameStarted()) {
+            blueScoreLabel.setVisible(true);
+            redScoreLabel.setVisible(true);
+            blueScoreLabel.setText("SOS: " + game.getBlueScore());
+            redScoreLabel.setText("SOS: " + game.getRedScore());
+        } 
+        else {
+            blueScoreLabel.setVisible(false);
+            redScoreLabel.setVisible(false);
         }
     }
     

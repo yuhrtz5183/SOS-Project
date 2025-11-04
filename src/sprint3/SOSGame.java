@@ -139,4 +139,18 @@ public class SOSGame {
 		return gameModeHandler.getWinner();
 	}
 	
+	public int getBlueScore() {
+		if (gameModeHandler instanceof GeneralGameMode) {
+			return ((GeneralGameMode) gameModeHandler).getBlueScore();
+		}
+		return 0;
+	}
+	
+	public int getRedScore() {
+		if (gameModeHandler instanceof GeneralGameMode) {
+			return ((GeneralGameMode) gameModeHandler).getRedScore();
+		}
+		return 0;
+	}
+	
 }
