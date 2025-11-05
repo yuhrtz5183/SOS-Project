@@ -27,7 +27,7 @@ public class TestGameMode {
     
     // AC 5.1: Simple game ends when first SOS is created
     @Test
-    public void testSimpleGameEndsOnFirstSOS() {
+    public void testSimpleGame() {
         SOSGame game = new SOSGame(3, SOSBoard.GameMode.SIMPLE);
         game.startNewGame();
         
@@ -44,7 +44,7 @@ public class TestGameMode {
     
     // AC 6.1/6.2: General game continues until board full and determines winner by score
     @Test
-    public void testGeneralGameDeterminesWinnerByScore() {
+    public void testGeneralGame() {
         SOSGame game = new SOSGame(3, SOSBoard.GameMode.GENERAL);
         game.startNewGame();
         
@@ -68,5 +68,53 @@ public class TestGameMode {
         // Game should end when board is full
         assertTrue(game.isGameEnded());
         assertEquals("Blue Player", game.getWinner());
+    }
+    
+    // Test simple game draw scenario
+    @Test
+    public void testSimpleGameDraw() {
+        SOSGame game = new SOSGame(3, SOSBoard.GameMode.SIMPLE);
+        game.startNewGame();
+        
+        // Fill board without creating SOS
+        game.makeMove(0, 0, SOSBoard.TileState.S);  // Blue
+        game.makeMove(0, 1, SOSBoard.TileState.S);  // Red
+        game.makeMove(0, 2, SOSBoard.TileState.O);  // Blue
+        game.makeMove(1, 0, SOSBoard.TileState.O);  // Red
+        game.makeMove(1, 1, SOSBoard.TileState.O);  // Blue
+        game.makeMove(1, 2, SOSBoard.TileState.S);  // Red
+        game.makeMove(2, 0, SOSBoard.TileState.S);  // Blue
+        game.makeMove(2, 1, SOSBoard.TileState.O);  // Red
+        game.makeMove(2, 2, SOSBoard.TileState.S);  // Blue
+        
+        assertTrue(game.isGameEnded());
+        assertEquals("Draw", game.getWinner());
+    }
+    
+    // Test general game draw with equal scores
+    @Test
+    public void testGeneralGameDraw() {
+        SOSGame game = new SOSGame(3, SOSBoard.GameMode.GENERAL);
+        game.startNewGame();
+        
+        // Blue creates horizontal SOS at row 0
+        game.makeMove(0, 0, SOSBoard.TileState.S);  // Blue
+        game.makeMove(1, 0, SOSBoard.TileState.S);  // Red
+        game.makeMove(0, 1, SOSBoard.TileState.O);  // Blue
+        game.makeMove(1, 1, SOSBoard.TileState.O);  // Red
+        game.makeMove(0, 2, SOSBoard.TileState.S);  // Blue creates SOS, score = 1
+        
+        // Red creates vertical SOS at column 0
+        game.makeMove(1, 2, SOSBoard.TileState.S);  // Blue (extra turn)
+        game.makeMove(2, 0, SOSBoard.TileState.S);  // Red creates SOS, score = 1
+        
+        // Fill remaining cells
+        game.makeMove(2, 1, SOSBoard.TileState.O);  // Red (extra turn)
+        game.makeMove(2, 2, SOSBoard.TileState.O);  // Blue
+        
+        assertTrue(game.isGameEnded());
+        assertEquals(1, game.getBlueScore());
+        assertEquals(1, game.getRedScore());
+        assertEquals("Draw", game.getWinner());
     }
 }
