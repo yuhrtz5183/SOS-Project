@@ -1,5 +1,8 @@
 package sprint3;
 
+import java.awt.Color;
+import java.util.*;
+
 // Game logic for general game mode
 public class GeneralGameMode implements GameMode {
     private final SOSBoard board;
@@ -7,6 +10,7 @@ public class GeneralGameMode implements GameMode {
     private String winner;
     private int blueScore;
     private int redScore;
+    private List<SOSGUI.SOSLine> sosLines;
 
     public GeneralGameMode(SOSBoard board, SOSGame game) {
         this.board = board;
@@ -14,14 +18,16 @@ public class GeneralGameMode implements GameMode {
         this.winner = null;
         this.blueScore = 0;
         this.redScore = 0;
+        this.sosLines = new ArrayList<>();
     }
 
     @Override
     public void handleMove(int row, int column) {
-        int numOfSOS = countSOS(row, column);
+        boolean isBlue = !board.isBluePlayerTurn();
+        Color playerColor = isBlue ? Color.BLUE : Color.RED;
+        int numOfSOS = countAndAddSOSLines(row, column, playerColor);
 
         if (numOfSOS > 0) {
-            boolean isBlue = !board.isBluePlayerTurn();
             if (isBlue) {
                 blueScore += numOfSOS;
             }
@@ -45,7 +51,7 @@ public class GeneralGameMode implements GameMode {
         }
     }
 
-    private int countSOS(int row, int column) {
+    private int countAndAddSOSLines(int row, int column, Color playerColor) {
         int count = 0;
         int[][] directions = { 
             {0, 1}, 
@@ -59,12 +65,15 @@ public class GeneralGameMode implements GameMode {
             int dc = d[1];
             
             if (isPattern(row - dr, column - dc, row, column, row + dr, column + dc)) {
+                sosLines.add(new SOSGUI.SOSLine(row - dr, column - dc, row + dr, column + dc, playerColor));
                 count++;
             }
             if (isPattern(row, column, row + dr, column + dc, row + 2 * dr, column + 2 * dc)) {
+                sosLines.add(new SOSGUI.SOSLine(row, column, row + 2 * dr, column + 2 * dc, playerColor));
                 count++;
             }
             if (isPattern(row - 2 * dr, column - 2 * dc, row - dr, column - dc, row, column)) {
+                sosLines.add(new SOSGUI.SOSLine(row - 2 * dr, column - 2 * dc, row, column, playerColor));
                 count++;
             }
         }
@@ -85,6 +94,11 @@ public class GeneralGameMode implements GameMode {
     @Override
     public String getWinner() {
         return winner;
+    }
+
+    @Override
+    public List<SOSGUI.SOSLine> getSOSLines() {
+        return sosLines;
     }
     
     public int getBlueScore() {

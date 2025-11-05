@@ -11,6 +11,8 @@ public class SOSGUI extends JFrame {
     private SOSBoard board;
     private JButton newGameButton;
     private JButton[][] boardButtons;
+    private JLayeredPane layeredBoardPane;
+    private JPanel linePanel;
     
     // Game buttons
     private JRadioButton simpleGameRadioButton;
@@ -162,14 +164,27 @@ public class SOSGUI extends JFrame {
         // Game board panel
         JPanel boardPanel = new JPanel(new BorderLayout());
         boardPanel.setBorder(BorderFactory.createTitledBorder("Game Board"));
+        
+        layeredBoardPane = new JLayeredPane();
+        layeredBoardPane.setPreferredSize(new Dimension(board.getSize() * 62, board.getSize() * 62));
+        
         JPanel boardGridPanel = new JPanel(new GridLayout(board.getSize(), board.getSize(), 2, 2));
+        boardGridPanel.setBounds(0, 0, board.getSize() * 62, board.getSize() * 62);
         
         for (int row = 0; row < board.getSize(); row++) {
             for (int col = 0; col < board.getSize(); col++) {
                 boardGridPanel.add(boardButtons[row][col]);
             }
         }
-        boardPanel.add(boardGridPanel, BorderLayout.CENTER);
+        
+        linePanel = new LinePanel();
+        linePanel.setBounds(0, 0, board.getSize() * 62, board.getSize() * 62);
+        linePanel.setOpaque(false);
+        
+        layeredBoardPane.add(boardGridPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredBoardPane.add(linePanel, JLayeredPane.PALETTE_LAYER);
+        
+        boardPanel.add(layeredBoardPane, BorderLayout.CENTER);
         setupBoardEventListeners();
         
         // Red player panel
@@ -264,14 +279,28 @@ public class SOSGUI extends JFrame {
         
         // Create new board buttons with new size
         createBoardButtons(newSize);
-        JPanel boardPanel = new JPanel(new GridLayout(newSize, newSize, 2, 2));
+        
+        // Create layered pane with overlay
+        layeredBoardPane = new JLayeredPane();
+        layeredBoardPane.setPreferredSize(new Dimension(newSize * 62, newSize * 62));
+        
+        JPanel boardGridPanel = new JPanel(new GridLayout(newSize, newSize, 2, 2));
+        boardGridPanel.setBounds(0, 0, newSize * 62, newSize * 62);
         
         for (int row = 0; row < newSize; row++) {
         	for (int col = 0; col < newSize; col++) {
-            	boardPanel.add(boardButtons[row][col]);
+            	boardGridPanel.add(boardButtons[row][col]);
             }
         }
-        centerPanel.add(boardPanel, BorderLayout.CENTER);
+        
+        linePanel = new LinePanel();
+        linePanel.setBounds(0, 0, newSize * 62, newSize * 62);
+        linePanel.setOpaque(false);
+        
+        layeredBoardPane.add(boardGridPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredBoardPane.add(linePanel, JLayeredPane.PALETTE_LAYER);
+        
+        centerPanel.add(layeredBoardPane, BorderLayout.CENTER);
         
         // Refreshes the board correctly/accordingly
         revalidate();
@@ -373,6 +402,9 @@ public class SOSGUI extends JFrame {
         }
         
         updateScoreLabels();
+        if (linePanel != null) {
+            linePanel.repaint();
+        }
     }
     
     private void updateScoreLabels() {
@@ -394,6 +426,9 @@ public class SOSGUI extends JFrame {
                 JButton button = boardButtons[row][col];
                 button.setText("");
             }
+        }
+        if (linePanel != null) {
+            linePanel.repaint();
         }
     }
     
@@ -425,6 +460,70 @@ public class SOSGUI extends JFrame {
         boardSizeField.setEnabled(enabled);
         simpleGameRadioButton.setEnabled(enabled);
         generalGameRadioButton.setEnabled(enabled);
+    }
+    
+    // SOS line panel class
+    private class LinePanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setStroke(new BasicStroke(3));
+            
+            java.util.List<SOSLine> lines = game.getSOSLines();
+            if (lines == null) {
+                return;
+            }
+            
+            int cellSize = 62;
+            int offset = cellSize / 2;
+            
+            for (SOSLine line : lines) {
+                g2d.setColor(line.getColor());
+                int x1 = line.getStartCol() * cellSize + offset;
+                int y1 = line.getStartRow() * cellSize + offset;
+                int x2 = line.getEndCol() * cellSize + offset;
+                int y2 = line.getEndRow() * cellSize + offset;
+                g2d.drawLine(x1, y1, x2, y2);
+            }
+        }
+    }
+    
+    // SOS line class
+    public static class SOSLine {
+        private final int startRow;
+        private final int startCol;
+        private final int endRow;
+        private final int endCol;
+        private final Color color;
+        
+        public SOSLine(int startRow, int startCol, int endRow, int endCol, Color color) {
+            this.startRow = startRow;
+            this.startCol = startCol;
+            this.endRow = endRow;
+            this.endCol = endCol;
+            this.color = color;
+        }
+        
+        public int getStartRow() {
+            return startRow;
+        }
+        
+        public int getStartCol() {
+            return startCol;
+        }
+        
+        public int getEndRow() {
+            return endRow;
+        }
+        
+        public int getEndCol() {
+            return endCol;
+        }
+        
+        public Color getColor() {
+            return color;
+        }
     }
     
     public static void main(String[] args) {

@@ -153,4 +153,7 @@ public class SOSGame {
 		return 0;
 	}
 	
+	public java.util.List<SOSGUI.SOSLine> getSOSLines() {
+		return gameModeHandler.getSOSLines();
+	}
 }
