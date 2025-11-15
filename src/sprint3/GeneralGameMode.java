@@ -10,7 +10,7 @@ public class GeneralGameMode implements GameMode {
     private String winner;
     private int blueScore;
     private int redScore;
-    private List<SOSGUI.SOSLine> sosLines;
+    private List<LineDrawer> sosLines;
 
     public GeneralGameMode(SOSBoard board, SOSGame game) {
         this.board = board;
@@ -65,15 +65,15 @@ public class GeneralGameMode implements GameMode {
             int dc = d[1];
             
             if (isPattern(row - dr, column - dc, row, column, row + dr, column + dc)) {
-                sosLines.add(new SOSGUI.SOSLine(row - dr, column - dc, row + dr, column + dc, playerColor));
+                sosLines.add(new LineDrawer(row - dr, column - dc, row + dr, column + dc, playerColor));
                 count++;
             }
             if (isPattern(row, column, row + dr, column + dc, row + 2 * dr, column + 2 * dc)) {
-                sosLines.add(new SOSGUI.SOSLine(row, column, row + 2 * dr, column + 2 * dc, playerColor));
+                sosLines.add(new LineDrawer(row, column, row + 2 * dr, column + 2 * dc, playerColor));
                 count++;
             }
             if (isPattern(row - 2 * dr, column - 2 * dc, row - dr, column - dc, row, column)) {
-                sosLines.add(new SOSGUI.SOSLine(row - 2 * dr, column - 2 * dc, row, column, playerColor));
+                sosLines.add(new LineDrawer(row - 2 * dr, column - 2 * dc, row, column, playerColor));
                 count++;
             }
         }
@@ -97,7 +97,7 @@ public class GeneralGameMode implements GameMode {
     }
 
     @Override
-    public List<SOSGUI.SOSLine> getSOSLines() {
+    public List<LineDrawer> getSOSLines() {
         return sosLines;
     }
     

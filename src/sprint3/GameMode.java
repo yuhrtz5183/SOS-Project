@@ -9,5 +9,5 @@ public interface GameMode {
 
     String getWinner();
     
-    List<SOSGUI.SOSLine> getSOSLines();
+    List<LineDrawer> getSOSLines();
 }

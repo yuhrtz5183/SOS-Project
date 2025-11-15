@@ -8,7 +8,7 @@ public class SimpleGameMode implements GameMode {
     private final SOSBoard board;
     private final SOSGame game;
     private String winner;
-    private List<SOSGUI.SOSLine> sosLines;
+    private List<LineDrawer> sosLines;
 
     public SimpleGameMode(SOSBoard board, SOSGame game) {
         this.board = board;
@@ -58,7 +58,7 @@ public class SimpleGameMode implements GameMode {
                         if (board.getTile(r1, c1) == SOSBoard.TileState.S && 
                             board.getTile(r2, c2) == SOSBoard.TileState.O && 
                             board.getTile(r3, c3) == SOSBoard.TileState.S) {
-                            sosLines.add(new SOSGUI.SOSLine(r1, c1, r3, c3, playerColor));
+                            sosLines.add(new LineDrawer(r1, c1, r3, c3, playerColor));
                             return;
                         }
                     }
@@ -73,7 +73,7 @@ public class SimpleGameMode implements GameMode {
     }
     
     @Override
-    public List<SOSGUI.SOSLine> getSOSLines() {
+    public List<LineDrawer> getSOSLines() {
         return sosLines;
     }
 }

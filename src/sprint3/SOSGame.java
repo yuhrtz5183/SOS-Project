@@ -153,7 +153,7 @@ public class SOSGame {
 		return 0;
 	}
 	
-	public java.util.List<SOSGUI.SOSLine> getSOSLines() {
+	public java.util.List<LineDrawer> getSOSLines() {
 		return gameModeHandler.getSOSLines();
 	}
 }

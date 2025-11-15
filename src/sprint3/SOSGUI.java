@@ -470,7 +470,7 @@ public class SOSGUI extends JFrame {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setStroke(new BasicStroke(3));
             
-            java.util.List<SOSLine> lines = game.getSOSLines();
+            java.util.List<LineDrawer> lines = game.getSOSLines();
             if (lines == null) {
                 return;
             }
@@ -478,7 +478,7 @@ public class SOSGUI extends JFrame {
             int cellSize = 62;
             int offset = cellSize / 2;
             
-            for (SOSLine line : lines) {
+            for (LineDrawer line : lines) {
                 g2d.setColor(line.getColor());
                 int x1 = line.getStartCol() * cellSize + offset;
                 int y1 = line.getStartRow() * cellSize + offset;
@@ -489,42 +489,6 @@ public class SOSGUI extends JFrame {
         }
     }
     
-    // SOS line class
-    public static class SOSLine {
-        private final int startRow;
-        private final int startCol;
-        private final int endRow;
-        private final int endCol;
-        private final Color color;
-        
-        public SOSLine(int startRow, int startCol, int endRow, int endCol, Color color) {
-            this.startRow = startRow;
-            this.startCol = startCol;
-            this.endRow = endRow;
-            this.endCol = endCol;
-            this.color = color;
-        }
-        
-        public int getStartRow() {
-            return startRow;
-        }
-        
-        public int getStartCol() {
-            return startCol;
-        }
-        
-        public int getEndRow() {
-            return endRow;
-        }
-        
-        public int getEndCol() {
-            return endCol;
-        }
-        
-        public Color getColor() {
-            return color;
-        }
-    }
     
     public static void main(String[] args) {
     	new SOSGUI().setVisible(true);
