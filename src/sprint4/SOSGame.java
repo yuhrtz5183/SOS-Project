@@ -19,6 +19,7 @@ public class SOSGame {
 	private boolean gameStarted;
 	private boolean gameEnded;
     private GameMode gameModeHandler;
+    private ComputerPlayer computerPlayer;
 	
 	public SOSGame(int boardSize, SOSBoard.GameMode gameMode) {
 		this.board = new SOSBoard(boardSize, gameMode);
@@ -28,6 +29,7 @@ public class SOSGame {
 		this.redLetter = PlayerLetter.O;
 		this.gameStarted = false;
 		this.gameEnded = false;
+		this.computerPlayer = new ComputerPlayer();
 		
 		// Gamemode logic implementation
 		if (gameMode == SOSBoard.GameMode.SIMPLE) {
@@ -155,5 +157,25 @@ public class SOSGame {
 	
 	public java.util.List<LineDrawer> getSOSLines() {
 		return gameModeHandler.getSOSLines();
+	}
+	
+	public boolean isCurrentPlayerComputer() {
+		if (isBluePlayerTurn()) {
+			return blueType == PlayerType.COMPUTER;
+		} else {
+			return redType == PlayerType.COMPUTER;
+		}
+	}
+
+	public ComputerPlayer.Move makeComputerMove() {
+		if (!isCurrentPlayerComputer() || gameEnded) {
+			return null;
+		}
+		
+		ComputerPlayer.Move move = computerPlayer.makeMove(board);
+		if (move != null) {
+			makeMove(move.row, move.col, move.letter);
+		}
+		return move;
 	}
 }

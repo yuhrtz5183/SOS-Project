@@ -3,6 +3,7 @@ package sprint4;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.Timer;
 
 // SOSGUI - handles user interface
 public class SOSGUI extends JFrame {
@@ -32,6 +33,8 @@ public class SOSGUI extends JFrame {
     
     private JLabel blueScoreLabel;
     private JLabel redScoreLabel;
+    
+    private Timer computerMoveTimer;
     
     public SOSGUI() {
         setTitle("SOS Game");
@@ -263,6 +266,7 @@ public class SOSGUI extends JFrame {
             updateGameSettingsEnabled(false);
             updateScoreLabels();
             updateStatus();
+            checkComputerMove();
         });
         
         blueSRadioButton.addActionListener(e -> updatePlayerSettings());
@@ -355,6 +359,7 @@ public class SOSGUI extends JFrame {
                 game.endGame();
             }
             updateStatus();
+            checkComputerMove();
         }
         else {
             JOptionPane.showMessageDialog(this, 
@@ -489,6 +494,36 @@ public class SOSGUI extends JFrame {
         }
     }
     
+    private void checkComputerMove() {
+        if (computerMoveTimer != null && computerMoveTimer.isRunning()) {
+            computerMoveTimer.stop();
+        }
+        
+        if (game.isGameStarted() && !game.isGameEnded() && game.isCurrentPlayerComputer()) {
+            // delay for computer move
+            computerMoveTimer = new Timer(250, e -> {
+                makeComputerMove();
+            });
+            computerMoveTimer.setRepeats(false);
+            computerMoveTimer.start();
+        }
+    }
+    
+    private void makeComputerMove() {
+        if (!game.isGameStarted() || game.isGameEnded()) {
+            return;
+        }
+        ComputerPlayer.Move move = game.makeComputerMove();
+        
+        if (move != null) {
+            updateBoardDisplay();
+            if (game.getBoard().isBoardFull()) {
+                game.endGame();
+            }
+            updateStatus();
+            checkComputerMove();
+        }
+    }
     
     public static void main(String[] args) {
     	new SOSGUI().setVisible(true);
