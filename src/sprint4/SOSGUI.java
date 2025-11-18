@@ -264,6 +264,7 @@ public class SOSGUI extends JFrame {
             game.startNewGame();
             clearBoardDisplay();
             updateGameSettingsEnabled(false);
+            updatePlayerTypeEnabled();
             updateScoreLabels();
             updateStatus();
             checkComputerMove();
@@ -441,6 +442,7 @@ public class SOSGUI extends JFrame {
         if (!game.isGameStarted()) {
             statusLabel.setText("Click 'New Game' to start");
             updateGameSettingsEnabled(true);
+            updatePlayerTypeEnabled();
         } 
         else if (game.isGameEnded()) {
             String winner = game.getWinner();
@@ -454,9 +456,11 @@ public class SOSGUI extends JFrame {
                 statusLabel.setText("Game Over - " + winner + " wins!");
             }
             updateGameSettingsEnabled(true);
+            updatePlayerTypeEnabled();
         } 
         else {
             statusLabel.setText(game.getCurrentPlayer() + "'s Turn");
+            updatePlayerTypeEnabled();
         }
     }
     
@@ -465,6 +469,15 @@ public class SOSGUI extends JFrame {
         boardSizeField.setEnabled(enabled);
         simpleGameRadioButton.setEnabled(enabled);
         generalGameRadioButton.setEnabled(enabled);
+    }
+
+    // Enables/disables player type selection
+    private void updatePlayerTypeEnabled() {
+        boolean enable = !(game.isGameStarted() && !game.isGameEnded());
+        blueHumanRadioButton.setEnabled(enable);
+        blueComputerRadioButton.setEnabled(enable);
+        redHumanRadioButton.setEnabled(enable);
+        redComputerRadioButton.setEnabled(enable);
     }
     
     // SOS line panel class
