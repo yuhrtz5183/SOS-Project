@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import sprint3.SOSBoard.GameMode;
+import sprint4.SOSBoard.GameMode;
 
 import static org.junit.Assert.*;
 
