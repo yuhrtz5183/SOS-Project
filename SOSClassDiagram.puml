@@ -1,0 +1,230 @@
+@startuml SOSClassDiagram
+left to right direction
+skinparam classAttributeIconSize 0
+
+' Enums
+enum PlayerType {
+    HUMAN
+    COMPUTER
+}
+
+enum PlayerLetter {
+    S
+    O
+}
+
+enum TileState {
+    EMPTY
+    S
+    O
+}
+
+enum GameModeEnum {
+    SIMPLE
+    GENERAL
+}
+
+' Classes
+class SOSGUI {
+    - game: SOSGame
+    - board: SOSBoard
+    - newGameButton: JButton
+    - boardButtons: JButton[][]
+    - layeredBoardPane: JLayeredPane
+    - linePanel: JPanel
+    - simpleGameRadioButton: JRadioButton
+    - generalGameRadioButton: JRadioButton
+    - boardSizeField: JComboBox<String>
+    - statusLabel: JLabel
+    - blueHumanRadioButton: JRadioButton
+    - blueComputerRadioButton: JRadioButton
+    - redHumanRadioButton: JRadioButton
+    - redComputerRadioButton: JRadioButton
+    - blueSRadioButton: JRadioButton
+    - blueORadioButton: JRadioButton
+    - redSRadioButton: JRadioButton
+    - redORadioButton: JRadioButton
+    - blueScoreLabel: JLabel
+    - redScoreLabel: JLabel
+    - computerMoveTimer: Timer
+    --
+    + SOSGUI()
+    - createComponents(): void
+    - panelLayout(): void
+    - setupEventListeners(): void
+    - updateStatus(): void
+    - handleBoardClick(int, int): void
+    - updateGameSettingsEnabled(boolean): void
+    - updatePlayerTypeEnabled(): void
+    - checkComputerMove(): void
+    - makeComputerMove(): void
+}
+
+class SOSGame {
+    - board: SOSBoard
+    - blueType: PlayerType
+    - redType: PlayerType
+    - blueLetter: PlayerLetter
+    - redLetter: PlayerLetter
+    - gameStarted: boolean
+    - gameEnded: boolean
+    - gameModeHandler: GameMode
+    - computerPlayer: ComputerPlayer
+    --
+    + SOSGame(int, GameModeEnum)
+    + getBoard(): SOSBoard
+    + getBluePlayerType(): PlayerType
+    + setBluePlayerType(PlayerType): void
+    + getRedPlayerType(): PlayerType
+    + setRedPlayerType(PlayerType): void
+    + getBluePlayerLetter(): PlayerLetter
+    + setBluePlayerLetter(PlayerLetter): void
+    + getRedPlayerLetter(): PlayerLetter
+    + setRedPlayerLetter(PlayerLetter): void
+    + isGameStarted(): boolean
+    + isGameEnded(): boolean
+    + startNewGame(): void
+    + makeMove(int, int, TileState): boolean
+    + getCurrentPlayer(): String
+    + isBluePlayerTurn(): boolean
+    + getCurrentPlayerLetter(): TileState
+    + endGame(): void
+    + isBoardFull(): boolean
+    + getWinner(): String
+    + getBlueScore(): int
+    + getRedScore(): int
+    + getSOSLines(): List<LineDrawer>
+    + isCurrentPlayerComputer(): boolean
+    + makeComputerMove(): Move
+}
+
+class SOSBoard {
+    - size: int
+    - gameMode: GameModeEnum
+    - tiles: TileState[][]
+    - isBluePlayerTurn: boolean
+    --
+    + SOSBoard(int, GameModeEnum)
+    + getSize(): int
+    + resizeBoard(int): void
+    + {static} isValidBoardSize(int): boolean
+    + getGameMode(): GameModeEnum
+    + getTile(int, int): TileState
+    + isValidPosition(int, int): boolean
+    + isTileEmpty(int, int): boolean
+    + makeMove(int, int, TileState): boolean
+    + isBluePlayerTurn(): boolean
+    + getCurrentPlayer(): String
+    + extraTurn(): void
+    + reset(): void
+    + isBoardFull(): boolean
+    + checkSOS(): boolean
+    + multipleSOS(int, int): boolean
+}
+
+interface GameMode {
+    + handleMove(int, int): void
+    + getWinner(): String
+    + getSOSLines(): List<LineDrawer>
+}
+
+class SimpleGameMode {
+    - board: SOSBoard
+    - game: SOSGame
+    - winner: String
+    - sosLines: List<LineDrawer>
+    --
+    + SimpleGameMode(SOSBoard, SOSGame)
+    + handleMove(int, int): void
+    + getWinner(): String
+    + getSOSLines(): List<LineDrawer>
+    - addSOSLine(Color): void
+}
+
+class GeneralGameMode {
+    - board: SOSBoard
+    - game: SOSGame
+    - winner: String
+    - blueScore: int
+    - redScore: int
+    - sosLines: List<LineDrawer>
+    --
+    + GeneralGameMode(SOSBoard, SOSGame)
+    + handleMove(int, int): void
+    + getWinner(): String
+    + getSOSLines(): List<LineDrawer>
+    + getBlueScore(): int
+    + getRedScore(): int
+    - countAndAddSOSLines(int, int, Color): int
+    - isPattern(int, int, int, int, int, int): boolean
+}
+
+class ComputerPlayer {
+    - random: Random
+    --
+    + ComputerPlayer()
+    + makeMove(SOSBoard): Move
+    - randomMove(SOSBoard): Move
+    - findSOSMove(SOSBoard): Move
+    - completeSOS(SOSBoard, int, int, TileState): boolean
+    - SOScheckS(SOSBoard, int, int): boolean
+    - SOScheckO(SOSBoard, int, int): boolean
+}
+
+class Move {
+    + row: int
+    + col: int
+    + letter: TileState
+    --
+    + Move(int, int, TileState)
+}
+
+class LineDrawer {
+    - startRow: int
+    - startCol: int
+    - endRow: int
+    - endCol: int
+    - color: Color
+    --
+    + LineDrawer(int, int, int, int, Color)
+    + getStartRow(): int
+    + getStartCol(): int
+    + getEndRow(): int
+    + getEndCol(): int
+    + getColor(): Color
+}
+
+class LinePanel {
+    + paintComponent(Graphics): void
+}
+
+' Relationships
+SOSGUI "1" *-- "1" SOSGame : contains
+SOSGUI "1" *-- "1" SOSBoard : contains
+SOSGUI +-- LinePanel : inner class
+
+SOSGame "1" *-- "1" SOSBoard : contains
+SOSGame "1" *-- "1" ComputerPlayer : contains
+SOSGame "1" --> "1" GameMode : uses
+
+GameMode <|.. SimpleGameMode : implements
+GameMode <|.. GeneralGameMode : implements
+
+SimpleGameMode "1" --> "1" SOSBoard : uses
+SimpleGameMode "1" --> "1" SOSGame : uses
+SimpleGameMode "1" ..> "*" LineDrawer : creates
+
+GeneralGameMode "1" --> "1" SOSBoard : uses
+GeneralGameMode "1" --> "1" SOSGame : uses
+GeneralGameMode "1" ..> "*" LineDrawer : creates
+
+ComputerPlayer "1" +-- "1" Move : inner class
+ComputerPlayer "1" --> "1" SOSBoard : uses
+
+SOSGame "1" ..> "1" PlayerType : uses
+SOSGame "1" ..> "1" PlayerLetter : uses
+SOSBoard "1" ..> "1" TileState : uses
+SOSBoard "1" ..> "1" GameModeEnum : uses
+
+@enduml
+
