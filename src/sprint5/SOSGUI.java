@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.Timer;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 // SOSGUI - handles user interface
 public class SOSGUI extends JFrame {
@@ -260,8 +263,18 @@ public class SOSGUI extends JFrame {
         
         // Starts a new game
         newGameButton.addActionListener(e -> {
+            // Ask if user wants to record the game
+            int response = JOptionPane.showConfirmDialog(this,
+                "Would you like to record this game?","Record Game", JOptionPane.YES_NO_OPTION);
+            
             updatePlayerSettings();
             game.startNewGame();
+
+            if (response == JOptionPane.YES_OPTION) {
+                game.startRecording();
+                statusLabel.setText("Recording");
+            }
+            
             clearBoardDisplay();
             updateGameSettingsEnabled(false);
             updatePlayerTypeEnabled();
@@ -445,6 +458,11 @@ public class SOSGUI extends JFrame {
             updatePlayerTypeEnabled();
         } 
         else if (game.isGameEnded()) {
+            // Save recording automatically
+            if (game.isRecording()) {
+                autoSaveRecording();
+            }
+            
             String winner = game.getWinner();
             if (winner == null) {
                 statusLabel.setText("Game Over");
@@ -459,7 +477,11 @@ public class SOSGUI extends JFrame {
             updatePlayerTypeEnabled();
         } 
         else {
-            statusLabel.setText(game.getCurrentPlayer() + "'s Turn");
+            String status = game.getCurrentPlayer() + "'s Turn";
+            if (game.isRecording()) {
+                status += " (Recording...)";
+            }
+            statusLabel.setText(status);
             updatePlayerTypeEnabled();
         }
     }
@@ -535,6 +557,30 @@ public class SOSGUI extends JFrame {
             }
             updateStatus();
             checkComputerMove();
+        }
+    }
+    
+    // Autosave recordings
+    private void autoSaveRecording() {
+        game.stopRecording();
+        
+        // Create folder for recordings
+        File recordingsDir = new File("previous_games");
+        if (!recordingsDir.exists()) {
+            recordingsDir.mkdir();
+        }
+
+        String timestamp = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss").format(new Date());
+        String filename = "sos_game_" + timestamp + ".txt";
+        File file = new File(recordingsDir, filename);
+        
+        if (game.saveRecording(file)) {
+            JOptionPane.showMessageDialog(this,"Game saved to previous_games folder.",
+                "Recording Saved", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else {
+            JOptionPane.showMessageDialog(this,"Failed to save game recording.",
+            "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     

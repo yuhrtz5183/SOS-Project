@@ -20,6 +20,7 @@ public class SOSGame {
 	private boolean gameEnded;
     private GameMode gameModeHandler;
     private ComputerPlayer computerPlayer;
+    private GameRecorder recorder;
 	
 	public SOSGame(int boardSize, SOSBoard.GameMode gameMode) {
 		this.board = new SOSBoard(boardSize, gameMode);
@@ -30,6 +31,7 @@ public class SOSGame {
 		this.gameStarted = false;
 		this.gameEnded = false;
 		this.computerPlayer = new ComputerPlayer();
+		this.recorder = new FileRecorder();
 		
 		// Gamemode logic implementation
 		if (gameMode == SOSBoard.GameMode.SIMPLE) {
@@ -102,9 +104,16 @@ public class SOSGame {
 			return false;
 		}
 		
+		// Track current player for recording
+		String currentPlayer = isBluePlayerTurn() ? "BLUE" : "RED";
 		boolean moveSuccessful = board.makeMove(row, column, tileState);
 		
 		if (moveSuccessful) {
+			// Record the move if recording is on
+			if (recorder.isRecording()) {
+				recorder.recordMove(row, column, tileState, currentPlayer);
+			}
+			
 			// Use the game mode handler to process the move
 			gameModeHandler.handleMove(row, column);
 		}
@@ -177,5 +186,40 @@ public class SOSGame {
 			makeMove(move.row, move.col, move.letter);
 		}
 		return move;
+	}
+
+	public void startRecording() {
+		GameRecording.GameConfig config = new GameRecording.GameConfig(
+			board.getSize(),
+			board.getGameMode(),
+			blueType,
+			blueLetter,
+			redType,
+			redLetter
+		);
+		recorder.startRecording(config);
+	}
+	
+	public void stopRecording() {
+		if (recorder.isRecording()) {
+			GameRecording.GameResult result = new GameRecording.GameResult(
+				getWinner(),
+				getBlueScore(),
+				getRedScore()
+			);
+			recorder.stopRecording(result);
+		}
+	}
+	
+	public boolean isRecording() {
+		return recorder.isRecording();
+	}
+	
+	public boolean saveRecording(java.io.File file) {
+		return recorder.saveToFile(file);
+	}
+	
+	public GameRecorder getRecorder() {
+		return recorder;
 	}
 }
